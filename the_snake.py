@@ -83,6 +83,7 @@ class Apple(GameObject):
         self.draw_cell(surface, self.position)
 
     def randomize_position(self):
+        """Выбор позиции яблочка"""
         height = random.randrange(0, 480, 20)
         width = random.randrange(0, 640, 20)
         self.position = (height, width)
@@ -94,7 +95,8 @@ class Snake(GameObject):
     def __init__(self) -> None:
         """Начальное положение змейки"""
         super().__init__(
-            (GRID_WIDTH // 2 * GRID_SIZE, GRID_HEIGHT // 2 * GRID_SIZE), SNAKE_COLOR
+            (GRID_WIDTH // 2 * GRID_SIZE, GRID_HEIGHT // 2 * GRID_SIZE),
+            SNAKE_COLOR
         )
         self.length: int = 1
         self.positions: List[Tuple[int, int]] = [self.position]
