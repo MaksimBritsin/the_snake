@@ -55,18 +55,22 @@ class GameObject:
 class Apple(GameObject):
     """Яблочко"""
 
-    def __init__(self, snake_positions=None):
+    def __init__(self, invalid_coordinates=None):
         """Инициализация яблочка"""
         super().__init__()
+        if invalid_coordinates is None:
+            invalid_coordinates = []
         self.body_color = APPLE_COLOR
-        self.randomize_position(snake_positions)
+        self.invalid_coordinates = invalid_coordinates
+        self.randomize_position(self.invalid_coordinates)
 
-    def randomize_position(self, snake_positions=None):
+    def randomize_position(self, invalid_coordinates=None):
         """Выбор позиции яблочка"""
-        while self.position in snake_positions:
-            height = random.randrange(0, SCREEN_HEIGHT, GRID_SIZE)
-            width = random.randrange(0, SCREEN_WIDTH, GRID_SIZE)
-            self.position = (width, height)
+        while True:
+            self.position = (random.randrange(0, SCREEN_WIDTH, GRID_SIZE),
+                             random.randrange(0, SCREEN_HEIGHT, GRID_SIZE))
+            if self.position not in invalid_coordinates:
+                return
 
     def draw(self):
         """Отрисовка яблочка"""
@@ -158,7 +162,7 @@ def main():
     """Функция, во время которой игра продолжается"""
     pygame.init()
     snake = Snake()
-    apple = Apple(snake_positions=snake.positions)
+    apple = Apple(snake.positions)
 
     while True:
         clock.tick(SPEED)
@@ -168,7 +172,7 @@ def main():
 
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            apple.randomize_position(snake_positions=snake.positions)
+            apple.randomize_position(snake.positions)
         if (len(snake.positions) > 2 and snake.get_head_position()
                 in snake.positions[2:]):
             snake.reset()
