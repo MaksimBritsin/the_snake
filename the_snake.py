@@ -41,6 +41,7 @@ clock = pygame.time.Clock()
 
 class GameObject:
     """Родительский класс"""
+
     def __init__(self):
         """Инициализация объекта класса"""
         self.body_color = None
@@ -60,7 +61,7 @@ class Apple(GameObject):
         self.body_color = APPLE_COLOR
         self.randomize_position(snake_positions)
 
-    def randomize_position(self, snake_positions = None):
+    def randomize_position(self, snake_positions=None):
         """Выбор позиции яблочка"""
         while self.position in snake_positions:
             height = random.randrange(0, SCREEN_HEIGHT, GRID_SIZE)
@@ -76,6 +77,7 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Змейка"""
+
     def __init__(self):
         """Инициализатор змейки"""
         super().__init__()
@@ -167,7 +169,8 @@ def main():
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake_positions=snake.positions)
-        if len(snake.positions) > 2 and snake.get_head_position() in snake.positions[2:]:
+        if (len(snake.positions) > 2 and snake.get_head_position()
+                in snake.positions[2:]):
             snake.reset()
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.draw()
