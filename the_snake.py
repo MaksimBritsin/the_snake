@@ -52,14 +52,13 @@ class GameObject:
     @staticmethod
     def draw_rect(position, body_color):
         """Рисует прямоугольный объект."""
-        rect = pg.Rect((position[0], position[1]),
-                           (GRID_SIZE, GRID_SIZE))
+        rect = pg.Rect((position[0], position[1]), (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, body_color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
-
     @staticmethod
     def draw_last(position):
+        """Затирание последнего сегмента змейки."""
         rect = pg.Rect(
             (position[0], position[1]),
             (GRID_SIZE, GRID_SIZE)
@@ -81,7 +80,7 @@ class Apple(GameObject):
     и действия с ним.
     """
 
-    def __init__(self,invalid_positions=None):
+    def __init__(self, invalid_positions=None):
         """Конструктор класса Apple."""
         super().__init__()
         self.invalid_positions = invalid_positions
@@ -161,7 +160,6 @@ class Snake(GameObject):
         # Затирание последнего сегмента
         if self.last:
             self.draw_last((self.last[0], self.last[1]))
-
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
