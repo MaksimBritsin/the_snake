@@ -45,8 +45,6 @@ pg.display.set_caption('Змейка')
 clock = pg.time.Clock()
 
 
-
-
 class GameObject:
     """GameObject — это базовый класс, от которого наследуются другие игровые
     объекты.
