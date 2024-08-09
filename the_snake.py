@@ -2,11 +2,16 @@ import random
 
 import pygame as pg
 
+
 # Константы для размеров поля и сетки:
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
+
+# Все игровые клетки поля
+ALL_BOARD_POSITIONS = {(width, height) for width in range(0, SCREEN_WIDTH, GRID_SIZE)
+                       for height in range(0, SCREEN_HEIGHT, GRID_SIZE)}
 
 # Направления движения:
 UP = (0, -1)
@@ -39,6 +44,8 @@ pg.display.set_caption('Змейка')
 clock = pg.time.Clock()
 
 
+
+
 class GameObject:
     """GameObject — это базовый класс, от которого наследуются другие игровые
     объекты.
@@ -57,8 +64,8 @@ class GameObject:
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     @staticmethod
-    def draw_last(position):
-        """Затирание последнего сегмента змейки."""
+    def clean_rect(position):
+        """Затирание прямоугольного объекта."""
         rect = pg.Rect(
             (position[0], position[1]),
             (GRID_SIZE, GRID_SIZE)
@@ -80,24 +87,21 @@ class Apple(GameObject):
     и действия с ним.
     """
 
-    def __init__(self, invalid_positions=None):
+    def __init__(self, busy_positions=None):
         """Конструктор класса Apple."""
         super().__init__()
-        self.invalid_positions = invalid_positions
-        self.position = self.randomize_position(self.invalid_positions)
+        self.busy_positions = busy_positions
+        self.position = self.randomize_position(self.busy_positions)
         self.body_color = APPLE_COLOR
 
     @staticmethod
-    def randomize_position(invalid_positions):
+    def randomize_position(busy_positions):
         """Устанавливает случайное положение яблока на игровом поле."""
-        all_positions_set = set()
-        for i in range(0, SCREEN_WIDTH, GRID_SIZE):
-            for m in range(0, SCREEN_HEIGHT, GRID_SIZE):
-                all_positions_set.add((i, m))
-        if invalid_positions is None:
-            invalid_positions = []
-        all_positions_set -= set(invalid_positions)
-        return random.choice(tuple(all_positions_set))
+        all_positions = ALL_BOARD_POSITIONS
+        if busy_positions is None:
+            busy_positions = []
+        all_positions -= set(busy_positions)
+        return random.choice(tuple(all_positions))
 
     def draw(self):
         """Отрисовывает яблоко на игровой поверхности."""
@@ -129,27 +133,11 @@ class Snake(GameObject):
         удаляя последний элемент, если длина змейки не увеличилась.
         """
         head_position = self.get_head_position()
-        x_point = head_position[0]
-        y_point = head_position[1]
-
-        if x_point >= SCREEN_WIDTH:
-            x_point = - GRID_SIZE
-        elif x_point < 0:
-            x_point = SCREEN_WIDTH
-
-        if y_point >= SCREEN_HEIGHT:
-            y_point = - GRID_SIZE
-        elif y_point < 0:
-            y_point = SCREEN_HEIGHT
-
-        if self.direction == RIGHT:
-            self.positions.insert(0, (x_point + GRID_SIZE, y_point))
-        elif self.direction == LEFT:
-            self.positions.insert(0, (x_point - GRID_SIZE, y_point))
-        elif self.direction == UP:
-            self.positions.insert(0, (x_point, y_point - GRID_SIZE))
-        elif self.direction == DOWN:
-            self.positions.insert(0, (x_point, y_point + GRID_SIZE))
+        direction_x, direction_y = self.direction
+        self.positions.insert(0, (
+            (head_position[0] + (direction_x * GRID_SIZE)) % SCREEN_WIDTH,
+            (head_position[1] + (direction_y * GRID_SIZE)) % SCREEN_HEIGHT,
+        ))
         self.last = self.positions.pop()
 
     def draw(self):
@@ -159,7 +147,7 @@ class Snake(GameObject):
 
         # Затирание последнего сегмента
         if self.last:
-            self.draw_last((self.last[0], self.last[1]))
+            self.clean_rect((self.last[0], self.last[1]))
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
